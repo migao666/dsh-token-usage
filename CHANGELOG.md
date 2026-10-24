@@ -1,5 +1,12 @@
 # 更新记录
 
+## 0.2.3 — 2026-10-24
+
+- 「检查更新」的错误提示可读化：解码 PowerShell CLIXML，GitHub 404/401 时提示
+  「私有仓库需要 updateToken / 改为公开」。
+- PowerShell 调用改用 `-EncodedCommand`，避免脚本里的引号在 Windows 命令行被吃掉。
+- 仓库改为公开；新增 GitHub Actions：`ci`（语法/元数据检查）与 `release`（打 tag 自动构建 zip 并发 Release）。
+
 ## 0.2.2 — 2026-10-24
 
 - **面板「检查更新」**：历史弹窗标题栏下方新增一行，读取 GitHub `releases/latest`
