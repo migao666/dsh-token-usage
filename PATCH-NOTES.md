@@ -98,7 +98,21 @@
 **边界**：已经分档完成的历史记录不会因为节假日数据后到而自动重算；需要精确重算时删除
 `~/.dsh/token-usage/manifest.json` 让插件按日志重建（会丢掉日志已删会话的记录）。
 
-## 5. `schemastery` peer 依赖（安装层）
+## 5. 面板「检查更新」与自更新（Host + Client 半）
+
+- Host 新增 `GET /dsh-token-usage/api/update`（比较版本）与 `POST`（下载并安装），
+  通过 PowerShell `-EncodedCommand` 调 GitHub API（自动走系统代理；`updateToken` 经环境变量传入，
+  不落命令行）。GitHub 404/401 会转成「私有仓库需要 updateToken / 改为公开」的提示。
+- 安装流程：下载 Release 资产 → `Expand-Archive` → 校验包名 → 备份现有文件到
+  `~/.dsh/plugins/.update-backup-<旧版本>-<时间>`（保留 `node_modules`）→ 覆盖 → 提示重启。
+- 快照 `meta` 增加 `version`；客户端标题栏下方新增「检查更新 / 安装更新」那一行。
+- 新增配置 `updateRepo`（默认 `migao666/dsh-token-usage`）、`updateToken`（私有仓库需要）。
+
+**验证**：Release v0.2.2 存在时，把本地版本临时改成 0.2.1 → 接口返回 `newer: true`；
+POST 后 `applied: true`、版本变为 0.2.2、生成备份目录；无 token 访问私有仓库时返回
+可读的 404 提示。
+
+## 6. `schemastery` peer 依赖（安装层）
 
 包只把 `schemastery` 声明为 `peerDependencies`，而本机 profile 的
 `pnpm-workspace.yaml` 设了 `autoInstallPeers: false`，`file:` link 安装不会补 peer →

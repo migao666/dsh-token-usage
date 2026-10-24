@@ -71,6 +71,14 @@ workbuddyStatePath: 'D:\ls\docker\wb-deploy\workbuddy2api\data\state.json'
 汇率每 15 分钟从 `open.er-api.com` 获取 USD/CNY，失败回退到上次成功值或 `usdToCny`。
 找不到网关 state 时 `积分` 卡显示 `--`，不编造。
 
+## 检查更新
+
+历史面板标题栏下方有「检查更新」按钮：读取 `updateRepo` 的 GitHub 最新 Release，比较当前版本；
+有新版本时点「安装更新」会自动下载并覆盖安装（旧文件备份在
+`~/.dsh/plugins/.update-backup-<旧版本>-<时间>`），然后重启 DSH 生效。
+**私有仓库**需要在 profile 的 `cordis.patch.yml` 里给 `token-usage` 填 `updateToken`；
+把仓库改成公开则不需要。
+
 ## 换机器注意
 
 - `backupRoots` 是**本机路径**，新机器上不要照抄；`workbuddyStatePath` 留空即可

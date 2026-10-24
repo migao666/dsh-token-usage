@@ -70,6 +70,12 @@ cacheHitRate = cacheRead / (cacheRead + uncachedInput)
   - 没有官方价/网关价的模型显示 `--`，不编造；
 - 按天表默认今天在最上面，行内显示缓存读、新增输入、输出、缓存命中率。
 
+**检查更新**：历史弹窗标题栏下方有一行版本信息与「检查更新」按钮。Host 读取
+`updateRepo`（默认 `migao666/dsh-token-usage`）的 GitHub `releases/latest`，比较当前版本
+（`meta.version`）；发现新版本后点「安装更新」即可下载该 Release 的 zip、备份现有文件
+（备份到 `~/.dsh/plugins/.update-backup-<旧版本>-<时间>`，保留 `node_modules`）并覆盖安装，
+之后重启 DSH 生效。私有仓库需要在配置里填 `updateToken`（只读权限即可）；公开仓库留空。
+
 **费用口径**：费用卡有三种真实口径，点 `积分 / 人民币 / 美元` 切换：
 
 - **积分**：Host 从 workbuddy2api 网关的 `state.json` 读取
