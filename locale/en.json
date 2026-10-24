@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Token用量",
+    "description": "Live token usage for the current session and a durable cross-session history ledger."
+  }
+}

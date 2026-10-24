@@ -1,0 +1,78 @@
+# dsh-token-usage — bundle patch
+#
+# `dsh.bundle.patch` points here, so installing the bundle inserts the row after
+# the profile bundles and before the profile's own cordis.patch.yml. A bare
+# `- id:` row would override an existing row instead of adding one, so the row
+# must be nested under `insert`.
+- insert:
+    - id: token-usage
+      name: dsh-token-usage
+      config:
+        # Where the durable ledger lives. Empty means "<DSH_HOME>/token-usage".
+        root: ""
+        # Flush interval for the ledger manifest, in milliseconds.
+        flushIntervalMs: 2000
+        # Per-session log decode cap during the startup backfill, in bytes.
+        decodeCapBytes: 33554432
+        # Upper bound on sessions read by one startup backfill pass.
+        backfillLimit: 2000
+        # Day boundary: Beijing time (+480), fixed regardless of host timezone.
+        timeZoneOffsetMinutes: 480
+        # Optional WorkBuddy gateway state file; cost_per_1k is credits/1k tokens.
+        # Empty = auto-discover: WORKBUDDY_STATE_PATH / WORKBUDDY2API_STATE /
+        # WB_STATE_PATH, then the usual wb-deploy / workbuddy2api layouts under
+        # any drive root, then a bounded scan for a `workbuddy2api` directory.
+        # An explicit value always wins.
+        workbuddyStatePath: ''
+        # Reference USD -> CNY rate for the RMB cost view.
+        usdToCny: 7.2
+        # Live FX source; falls back to usdToCny when offline.
+        exchangeRateUrl: 'https://open.er-api.com/v6/latest/USD'
+        exchangeRateRefreshMs: 900000
+        # Official price tier: 'auto' prices every usage sample by the Beijing
+        # time peak windows (Mon-Fri 09:00-12:00, 14:00-18:00; off-peak is half),
+        # 'peak'/'offpeak' force one tier for estimation.
+        pricingTier: auto
+        # Extra Beijing dates (YYYY-MM-DD) billed as off-peak all day.
+        # 2026 China statutory holidays (offline fallback; the API below keeps
+        # later years current). Only statutory days off, not 调休 make-up workdays.
+        holidayDates:
+          - '2026-01-01'
+          - '2026-01-02'
+          - '2026-01-03'
+          - '2026-02-15'
+          - '2026-02-16'
+          - '2026-02-17'
+          - '2026-02-18'
+          - '2026-02-19'
+          - '2026-02-20'
+          - '2026-02-21'
+          - '2026-02-22'
+          - '2026-02-23'
+          - '2026-04-04'
+          - '2026-04-05'
+          - '2026-04-06'
+          - '2026-05-01'
+          - '2026-05-02'
+          - '2026-05-03'
+          - '2026-05-04'
+          - '2026-05-05'
+          - '2026-06-19'
+          - '2026-06-20'
+          - '2026-06-21'
+          - '2026-09-25'
+          - '2026-09-26'
+          - '2026-09-27'
+          - '2026-10-01'
+          - '2026-10-02'
+          - '2026-10-03'
+          - '2026-10-04'
+          - '2026-10-05'
+          - '2026-10-06'
+          - '2026-10-07'
+        # China statutory-holiday schedule API; `{year}` is replaced per request.
+        # Empty disables the API and leaves only `holidayDates` in effect.
+        holidayApiUrl: 'https://timor.tech/api/holiday/year/{year}'
+        # Optional session-backup roots. Empty for portable installs; add local
+        # paths only if this machine has historical session backups to import.
+        backupRoots: []

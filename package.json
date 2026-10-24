@@ -1,0 +1,51 @@
+{
+  "name": "dsh-token-usage",
+  "version": "0.2.1",
+  "private": true,
+  "description": "Token用量 statistics for DeepSeek Harness: live per-session readout, cross-session history, API/token charts, and WorkBuddy/DeepSeek cost views.",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "INSTALL.md",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "scripts": {
+    "build:client": "node scripts/build-client.mjs",
+    "build": "node scripts/build-client.mjs"
+  },
+  "engines": {
+    "node": ">=22.19"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ],
+      "platform": "web"
+    }
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.2",
+    "schemastery": "3.18.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0-rc <5",
+    "schemastery": "^3.18.0"
+  },
+  "license": "MIT"
+}

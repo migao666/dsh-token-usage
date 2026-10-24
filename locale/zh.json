@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Token用量",
+    "description": "显示当前会话的实时 token 用量，并持久记录跨会话的历史消耗。"
+  }
+}

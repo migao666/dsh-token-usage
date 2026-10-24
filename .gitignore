@@ -1,0 +1,11 @@
+node_modules/*
+!node_modules/schemastery/
+!node_modules/cosmokit/
+!node_modules/@standard-schema/
+
+# local build/debug leftovers
+*.orig-*
+*.bak
+*.tmp
+pnpm-lock.yaml
+*.log
