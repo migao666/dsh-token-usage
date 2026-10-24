@@ -1,0 +1,33 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the plugin zip
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist/dsh-token-usage
+          cp -r lib locale cordis.patch.yml icon.svg package.json \
+                README.md INSTALL.md PATCH-NOTES.md CHANGELOG.md dist/dsh-token-usage/
+          mkdir -p dist/dsh-token-usage/node_modules
+          cp -r node_modules/schemastery node_modules/cosmokit node_modules/@standard-schema \
+                dist/dsh-token-usage/node_modules/
+          cp patch_token_usage_*.py dist/dsh-token-usage/ 2>/dev/null || true
+          cd dist
+          zip -qr "../dsh-token-usage-${VERSION}.zip" dsh-token-usage
+          cd ..
+          ls -lh "dsh-token-usage-${VERSION}.zip"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dsh-token-usage-*.zip
+          generate_release_notes: true
