@@ -9,6 +9,8 @@ Token用量统计插件，为 DeepSeek Harness 记录**历史消耗**与**实时
 - **按模型精确到每次请求**：每条 `assistant/message` 用它自己的 `source.provider:model` 归属，
   同一会话中途换模型会拆成多行；日志/缓存里无法归属的差额记到「未标注」，不伪造模型。
 
+
+仓库（私有）：[https://github.com/migao666/dsh-token-usage](https://github.com/migao666/dsh-token-usage)
 ## 数据怎么来的
 
 实时通道全部走官方；历史优先走官方 `workspaceFiles`，不可用时兜底同源 HTTP 快照。
