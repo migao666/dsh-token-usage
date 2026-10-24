@@ -86,10 +86,12 @@ cacheHitRate = cacheRead / (cacheRead + uncachedInput)
   `workbuddy2api` 的目录；候选必须能解析出 `accounts[*].model_costs` 才采用，
   显式配置始终优先。来源见面板数据的 `costs.workbuddy.sourcePath`，
   `costs.workbuddy.source` 标明 `config` / `auto` / `none`；
-- **人民币 / 美元**：按 DeepSeek 官方公开价计算，只有官方价覆盖的模型才计入，
-  卡片显示覆盖比例；人民币由 Host 定期从
+- **人民币 / 美元**：按官方公开价计算（DeepSeek、智谱 GLM），只有有官方价的模型
+  才计入，卡片显示覆盖比例；人民币由 Host 定期从
   `https://open.er-api.com/v6/latest/USD` 读取 USD/CNY，失败时用上次成功值
   或 `usdToCny` 回退值，并在卡片标注「实时 / 上次 / 固定」。
+  **费用卡右侧的刷新图标**会一次性重拉汇率、DeepSeek/智谱官方价和 WorkBuddy
+  `state.json`；单个来源失败时保留旧值，不会把失败当成功。
   **高峰 / 空闲自动分档**（`pricingTier: auto`，默认）：DeepSeek 在北京时间
   周一至周五 09:00–12:00、14:00–18:00 收高峰价，其余时间（含周末与法定节假日）
   半价。Host 给每个 usage 样本按事件时间打上 `peak` / `offpeak`，分别计价后相加，
@@ -105,9 +107,16 @@ cacheHitRate = cacheRead / (cacheRead + uncachedInput)
   手工日期始终叠加生效（离线兜底，已内置 2026 全年 33 个法定休息日）。
   注意：已分档的历史记录不会因新增节假日数据自动重算（需要时删 `manifest.json` 重建）。
 
-DeepSeek 官方价来源：<https://api-docs.deepseek.com/quick_start/pricing>
-（2026-10-24 抓取；`deepseek-v4.1-flash` 缓存命中 $0.006/M、缓存未命中 $0.30/M、输出 $1.20/M，峰值价）。
-没有可靠单价的模型不计算，不编造金额。
+**官方公开价来源**：
+
+- DeepSeek：<https://api-docs.deepseek.com/quick_start/pricing>
+  （2026-10-24 抓取；`deepseek-v4.1-flash` 缓存命中 $0.006/M、未命中 $0.30/M、输出 $1.20/M，峰值价）。
+- 智谱 GLM：<https://docs.bigmodel.cn/cn/guide/start/pricing>
+  （2026-10-24 抓取；`GLM-5.3-Flash` 缓存命中 ¥0.23/M、未命中 ¥0.80/M、输出 ¥2.80/M，人民币价；Host 用实时 USD/CNY 折算成美元后计价）。
+
+`space-bunny` 是 WorkBuddy 的匿名模型，没有公开官方单价；OpenAI 官方定价页当前被
+Cloudflare 拦截，无法可靠抓取这些路由的单价。它们不计算，不编造金额；覆盖面会显示在
+费用卡上。
 
 隐藏面板也同步改成“本会话 Token + 组成条 + 缓存命中率 / 输出速度 / 上下文占用 / 轮次步数”。
 
