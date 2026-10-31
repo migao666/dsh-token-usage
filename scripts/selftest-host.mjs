@@ -4,13 +4,14 @@
  * Runs against the real session logs on this machine, so the folding is checked
  * against data the harness actually produced rather than a synthetic fixture.
  */
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { zstdCompressSync } from 'node:zlib';
 import {
   normalizeUsage, usageOf, parseSessionLog, decodeZstdLog,
   TokenLedger, backfill, backfillCaches, backfillBackups, aggregate, totalOf, promptOf, cacheHitOf, dayKey,
+  forceInstallPackage,
 } from '../lib/index.js';
 
 let failures = 0;
@@ -303,6 +304,35 @@ check('second request lands on 2026-10-23', d2 !== undefined && d2.totalTokens =
 check('per-day request counts follow sample times', d1 !== undefined && d1.requests === 1
   && d2 !== undefined && d2.requests === 1, JSON.stringify([d1 && d1.requests, d2 && d2.requests]));
 check('per-day totals sum to the session total', dayAgg.global.totalTokens === 33, String(dayAgg.global.totalTokens));
+
+// ---------------------------------------------------------------- install
+console.log('\n[15] forced copy install (update button)');
+{
+  const base = mkdtempSync(join(tmpdir(), 'tu-install-'));
+  const target = join(base, 'installed');
+  mkdirSync(join(target, 'lib'), { recursive: true });
+  mkdirSync(join(target, 'node_modules'), { recursive: true });
+  writeFileSync(join(target, 'package.json'), JSON.stringify({ name: 'dsh-token-usage', version: '0.2.4' }));
+  writeFileSync(join(target, 'lib', 'client.js'), 'old-client');
+  writeFileSync(join(target, 'stale.txt'), 'left over from the old build');
+  writeFileSync(join(target, 'node_modules', 'keep.txt'), 'keep me');
+
+  const release = join(base, 'release');
+  mkdirSync(join(release, 'lib'), { recursive: true });
+  writeFileSync(join(release, 'package.json'), JSON.stringify({ name: 'dsh-token-usage', version: '0.2.5' }));
+  writeFileSync(join(release, 'lib', 'client.js'), 'new-client');
+
+  const result = await forceInstallPackage({ packageDir: release, targetRoot: target, currentVersion: '0.2.4' });
+  check('installs the new version', result.installed === '0.2.5', result.installed);
+  check('reports verified', result.verified === true);
+  check('overwrites the client bundle', readFileSync(join(target, 'lib', 'client.js'), 'utf8') === 'new-client');
+  check('drops files the new version no longer ships', !existsSync(join(target, 'stale.txt')));
+  check('keeps node_modules', existsSync(join(target, 'node_modules', 'keep.txt')));
+  check('backs the old tree up first', existsSync(join(result.backup, 'package.json')));
+  check('backup still holds the old version',
+    JSON.parse(readFileSync(join(result.backup, 'package.json'), 'utf8')).version === '0.2.4');
+  rmSync(base, { recursive: true, force: true });
+}
 
 rmSync(tmp, { recursive: true, force: true });
 console.log(`\n=> ${failures === 0 ? 'ALL HOST TESTS PASSED' : failures + ' CHECK(S) FAILED'}`);
