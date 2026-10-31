@@ -32,7 +32,7 @@ const bars = [8, 12, 72, 26, 20, 31, 9, 63, 8, 5, 100, 52, 35, 3];
 
 const html = `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
-<title>Token用量 · 0.2.6 静态预览</title>
+<title>Token用量 · 0.2.4 静态预览</title>
 <style>
   /* The plugin reads these aliases from DSH; the preview supplies the light
      palette the app actually renders with. */
@@ -168,7 +168,7 @@ const html = `<!doctype html>
     </div>
     <div class="tsl-update-row tsl-update-row-footer">
       <div class="tsl-footer-actions">
-        <span class="tsl-muted">版本 0.2.6</span>
+        <span class="tsl-muted">版本 0.2.4</span>
         <button type="button" class="tsl-tab">检查更新</button>
       </div>
     </div>
