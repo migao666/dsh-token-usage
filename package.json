@@ -1,6 +1,6 @@
 {
   "name": "dsh-token-usage",
-  "version": "0.2.5",
+  "version": "0.2.4",
   "private": true,
   "description": "Token用量 statistics for DeepSeek Harness: live per-session readout, cross-session history, API/token charts, and WorkBuddy/DeepSeek cost views.",
   "type": "module",

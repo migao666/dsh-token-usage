@@ -189,6 +189,18 @@ dsh plugin --profile desktop add dsh-token-usage
       - 'E:\dsh会话备份_20261018_1840'
 ```
 
+## 积分单价缓存
+
+网关的 `state.json` 只保留最近 **6 小时**内观测到的 `model_costs`（`modelCostTTL`）。
+插件因此把见过的单价写进 `<root>/cost-rates.json`（按模型一行：`per1k` / `samples` /
+`firstSeen` / `lastSeen`），加载时与实时快照合并：
+
+- 新观测覆盖旧值；旧值保留到超过 `costRateRetentionDays`（默认 180 天）；
+- 网关离线、state.json 丢失或缓存损坏，都只降级为"用已有缓存 + 实时快照"，不报错；
+- 首次运行会扫 `<gateway>/backups/state.json.bak-*` 把旧单价导入缓存。
+
+所以"某天积分列显示 `--`"只剩一种含义：**那个模型从未被任何本地快照记录过**，插件不会编造价格。
+
 ## 账本文件
 
 ```
@@ -200,6 +212,7 @@ dsh plugin --profile desktop add dsh-token-usage
 ## 测试
 
 ```bash
+node scripts/selftest-cost-cache.mjs  # 积分单价缓存 / 合并 / 保留期 / 备份导入
 node scripts/selftest-host.mjs     # 折叠 / 水位 / 落盘 / 聚合 / 真实日志回扫
 node scripts/selftest-client.mjs   # 在 vm 里加载 lib/client.js 并渲染悬浮面板与弹窗
 node scripts/verify-parity.mjs     # 对拍官方 tokenUsage 投影口径
